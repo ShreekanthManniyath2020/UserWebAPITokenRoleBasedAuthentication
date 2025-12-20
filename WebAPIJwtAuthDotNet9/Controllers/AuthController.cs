@@ -13,7 +13,7 @@ namespace WebAPIJwtAuthDotNet9.Controllers
         public static User user = new();
 
         [HttpPost("register")]
-        public async Task<ActionResult<User>> Register([FromBody] UserDto request)
+        public async Task<ActionResult<User>> Register([FromBody] RegisterRequest request)
         {
             var user = await authService.RegisterAsync(request);
             if (user is null)
@@ -23,7 +23,7 @@ namespace WebAPIJwtAuthDotNet9.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<TokenResponseDto>> Login(UserDto request)
+        public async Task<ActionResult<AuthResponse>> Login(LoginRequest request)
         {
             var result = await authService.LoginAsync(request);
             if (result is null)
@@ -33,7 +33,7 @@ namespace WebAPIJwtAuthDotNet9.Controllers
         }
 
         [HttpPost("refresh-token")]
-        public async Task<ActionResult<TokenResponseDto>> RefreshToken(RefreshTokenRequestDto request)
+        public async Task<ActionResult<AuthResponse>> RefreshToken(RefreshTokenRequest request)
         {
             var result = await authService.RefreshTokensAsync(request);
             if (result is null || result.AccessToken is null || result.RefreshToken is null)

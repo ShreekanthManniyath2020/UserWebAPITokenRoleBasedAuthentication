@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -13,11 +14,11 @@ using WebAPIJwtAuth.Infrastructure.Data;
 
 namespace WebAPIJwtAuth.Application.Services
 {
-    public class AuthSerivce(ApplicationDbContext context, JWTSettings jWTSettings) : IAuthService
+    public class AuthSerivce(ApplicationDbContext context, JWTSettings jWTSettings, IMapper mapper) : IAuthService
     {
-        public async Task<TokenResponseDto?> LoginAsync(UserDto request)
+        public async Task<AuthResponse?> LoginAsync(LoginRequest request)
         {
-            var user = await context.Users.FirstOrDefaultAsync(u => u.Name == request.Name);
+            var user = await context.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
 
             if (user is null)
             {
@@ -35,18 +36,20 @@ namespace WebAPIJwtAuth.Application.Services
             return await CreateTokenResponse(user);
         }
 
-        private async Task<TokenResponseDto> CreateTokenResponse(User? user)
+        private async Task<AuthResponse> CreateTokenResponse(User? user)
         {
-            return new TokenResponseDto
+            return new AuthResponse
             {
                 AccessToken = CreateToken(user),
-                RefreshToken = await GenerateAndSaveRefreshTokenAsync(user)
+                RefreshToken = await GenerateAndSaveRefreshTokenAsync(user),
+                User = mapper.Map<UserDto>(user),
+                TokenExpiration = user.TokenExpiration!.Value,
             };
         }
 
-        public async Task<User?> RegisterAsync(UserDto request)
+        public async Task<User?> RegisterAsync(RegisterRequest request)
         {
-            if (await context.Users.AnyAsync(u => u.Name == request.Name))
+            if (await context.Users.AnyAsync(u => u.Email == request.Email))
             {
                 return null;
             }
@@ -54,8 +57,11 @@ namespace WebAPIJwtAuth.Application.Services
             var hashedPassword = new PasswordHasher<User>()
                 .HashPassword(user, request.Password);
 
-            user.Name = request.Name;
+            user.Email = request.Email;
             user.PasswordHash = hashedPassword;
+            user.FirstName = request.FirstName;
+            user.LastName = request.LastName;
+            user.Role = request.Role;
 
             context.Users.Add(user);
             await context.SaveChangesAsync();
@@ -63,7 +69,7 @@ namespace WebAPIJwtAuth.Application.Services
             return user;
         }
 
-        public async Task<TokenResponseDto?> RefreshTokensAsync(RefreshTokenRequestDto request)
+        public async Task<AuthResponse?> RefreshTokensAsync(RefreshTokenRequest request)
         {
             var user = await ValidateRefreshTokenAsync(request.UserId, request.RefreshToken);
             if (user is null)
@@ -76,7 +82,7 @@ namespace WebAPIJwtAuth.Application.Services
         {
             var user = await context.Users.FindAsync(userId);
             if (user is null || user.RefreshToken != refreshToken
-                || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+                || user.TokenExpiration <= DateTime.UtcNow)
             {
                 return null;
             }
@@ -96,7 +102,7 @@ namespace WebAPIJwtAuth.Application.Services
         {
             var refreshToken = GenerateRefreshToken();
             user.RefreshToken = refreshToken;
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            user.TokenExpiration = DateTime.UtcNow.AddDays(7);
             await context.SaveChangesAsync();
             return refreshToken;
         }
@@ -104,7 +110,7 @@ namespace WebAPIJwtAuth.Application.Services
         private string CreateToken(User user)
         {
             var claims = new List<Claim>{
-              new Claim(ClaimTypes.Name ,user.Name),
+              new Claim(ClaimTypes.Email ,user.Email),
                new Claim(ClaimTypes.NameIdentifier ,user.Id.ToString()),
                new Claim(ClaimTypes.Role ,user.Role)
 

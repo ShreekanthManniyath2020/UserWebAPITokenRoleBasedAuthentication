@@ -5,10 +5,10 @@ namespace WebAPIJwtAuth.Application.Interfaces
 {
     public interface IAuthService
     {
-        Task<User?> RegisterAsync(UserDto request);
+        Task<User?> RegisterAsync(RegisterRequest request);
 
-        Task<TokenResponseDto?> LoginAsync(UserDto request);
+        Task<AuthResponse?> LoginAsync(LoginRequest request);
 
-        Task<TokenResponseDto?> RefreshTokensAsync(RefreshTokenRequestDto request);
+        Task<AuthResponse?> RefreshTokensAsync(RefreshTokenRequest request);
     }
 }

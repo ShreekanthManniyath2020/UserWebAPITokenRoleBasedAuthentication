@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36623.8 d17.14
+VisualStudioVersion = 17.14.36623.8
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPIJwtAuthDotNet9", "WebAPIJwtAuthDotNet9\WebAPIJwtAuthDotNet9.csproj", "{50BD54A0-5499-4492-8C86-C7055AB1296F}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPIJwtAuth.Application", "WebAPIJwtAuth.Application\WebAPIJwtAuth.Application.csproj", "{83BCFE1D-E0BB-471C-9D62-0FC21D2F9154}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPIJwtAuth.Infrastructure", "WebAPIJwtAuth.Infrastructure\WebAPIJwtAuth.Infrastructure.csproj", "{8E99DF87-3C63-4C1A-A65F-25C34108D94D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoginMCVWebAPI", "LoginMCVWebAPI\LoginMCVWebAPI.csproj", "{D4A43042-5A65-BF5E-9C64-C44D75D04D75}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{8E99DF87-3C63-4C1A-A65F-25C34108D94D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E99DF87-3C63-4C1A-A65F-25C34108D94D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E99DF87-3C63-4C1A-A65F-25C34108D94D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4A43042-5A65-BF5E-9C64-C44D75D04D75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4A43042-5A65-BF5E-9C64-C44D75D04D75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4A43042-5A65-BF5E-9C64-C44D75D04D75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4A43042-5A65-BF5E-9C64-C44D75D04D75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

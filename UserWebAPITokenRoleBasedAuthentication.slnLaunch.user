@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "WebAPIJwtAuthDotNet9\\WebAPIJwtAuthDotNet9.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "LoginMCVWebAPI\\LoginMCVWebAPI.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
