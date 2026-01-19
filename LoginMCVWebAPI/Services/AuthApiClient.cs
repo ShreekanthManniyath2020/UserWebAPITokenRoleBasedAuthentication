@@ -1,4 +1,5 @@
 ﻿using LoginMCVWebAPI.Services.Interfaces;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using WebAPIJwtAuth.Application.DTOs;
@@ -11,6 +12,7 @@ namespace LoginMCVWebAPI.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
         private const string TokenKey = "JwtToken";
         private const string RefreshTokenKey = "RefreshToken";
+        private const string UserId = "UserId";
 
         public AuthApiClient(HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
         {
@@ -34,14 +36,16 @@ namespace LoginMCVWebAPI.Services
         {
             var token = GetToken();
             var refreshToken = GetRefreshToken();
+            var userId = _httpContextAccessor.HttpContext?.Session.GetString(UserId);
 
-            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(refreshToken))
+            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(refreshToken) || string.IsNullOrEmpty(userId))
                 return new ApiResponse<AuthResponse> { Success = false, Message = "No tokens available" };
 
             var request = new RefreshTokenRequest
             {
-                Token = token,
-                RefreshToken = refreshToken
+                Token = token
+                , RefreshToken = refreshToken
+                , UserId = Guid.Parse(userId!)
             };
 
             var response = await _httpClient.PostAsJsonAsync("api/auth/refresh-token", request);
@@ -64,11 +68,12 @@ namespace LoginMCVWebAPI.Services
         {
             try
             {
-                _httpClient.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", token);
-
-                var response = await _httpClient.GetAsync("api/auth/validate");
-                return response.IsSuccessStatusCode;
+                return await Task.Run(() =>
+                {
+                    var tokenHandler = new JwtSecurityTokenHandler();
+                    var jwtToken = tokenHandler.ReadJwtToken(token);
+                    return jwtToken.ValidTo > DateTime.UtcNow;
+                });
             }
             catch
             {
@@ -76,13 +81,14 @@ namespace LoginMCVWebAPI.Services
             }
         }
 
-        public void SetTokens(string token, string refreshToken)
+        public void SetTokens(string token, string refreshToken, Guid userId)
         {
             var session = _httpContextAccessor.HttpContext?.Session;
             if (session != null)
             {
                 session.SetString(TokenKey, token);
                 session.SetString(RefreshTokenKey, refreshToken);
+                session.SetString(UserId, userId.ToString());
             }
         }
 
@@ -121,12 +127,13 @@ namespace LoginMCVWebAPI.Services
             }
             else
             {
-                var error = JsonSerializer.Deserialize<ErrorResponse>(content, new JsonSerializerOptions
+                var error = JsonSerializer.Deserialize<string>(content, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 });
 
-                return new ApiResponse<T> { Success = false, Message = error?.Message ?? "An error occurred" };
+
+                return new ApiResponse<T> { Success = false, Message =  "An error occurred" }; //error?.Message ??
             }
         }
     }

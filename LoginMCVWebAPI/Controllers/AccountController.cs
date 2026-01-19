@@ -34,7 +34,7 @@ namespace LoginMCVWebAPI.Controllers
             if (result.Success && result.Data != null)
             {
                 // Store tokens in session
-                _authApiClient.SetTokens(result.Data.AccessToken, result.Data.RefreshToken);
+                _authApiClient.SetTokens(result.Data.AccessToken, result.Data.RefreshToken, result.Data.User.Id);
 
                 // Create claims identity
                 var claims = new[]

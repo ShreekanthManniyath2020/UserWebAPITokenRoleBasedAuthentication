@@ -23,6 +23,7 @@ namespace LoginMCVWebAPI.Controllers
 
         // GET: /products
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index(
             int page = 1,
             int pageSize = 12,

@@ -125,8 +125,7 @@ namespace WebAPIJwtAuth.Application.Services
                 issuer: jWTSettings.Issuer,
                 audience: jWTSettings.Audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddDays(1), //DateTime.Now.AddMinutes(
-                                                     //configuration.GetValue<double>("AppSettings:ExpireMinutes")),
+                expires: DateTime.Now.AddMinutes((double)jWTSettings.ExpireMinutes),
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);

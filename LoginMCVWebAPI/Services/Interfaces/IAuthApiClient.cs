@@ -16,7 +16,7 @@ namespace LoginMCVWebAPI.Services.Interfaces
 
         Task<bool> ValidateTokenAsync(string token);
 
-        void SetTokens(string token, string refreshToken);
+        void SetTokens(string token, string refreshToken,Guid guid);
 
         void ClearTokens();
     }

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
-using System.Reflection;
 using System.Text;
 using WebAPIJwtAuth.Application.Common.Mappings;
 using WebAPIJwtAuth.Application.DTOs;
@@ -28,10 +27,8 @@ var jwtSettings = new JWTSettings();
 builder.Configuration.GetSection("JWTSettings").Bind(jwtSettings);
 builder.Services.AddSingleton(jwtSettings);
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => 
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -45,11 +42,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateLifetime = true,
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(jwtSettings.SecretKey!)),
-            ValidateIssuerSigningKey = true
+            ValidateIssuerSigningKey = true,
+            ClockSkew = TimeSpan.Zero
         };
     });
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+//builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthSerivce>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
@@ -65,12 +64,10 @@ builder.Services.AddScoped<IValidator<UpdateProductDto>, UpdateProductValidator>
 builder.Services.AddScoped<IValidator<CreateCategoryDto>, CreateCategoryValidator>();
 builder.Services.AddScoped<IValidator<CreateBrandDto>, CreateBrandValidator>();
 
-
 // Register AutoMapper with Assembly Scanning
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 // OR if MappingProfile is in Application layer
 //builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
-
 
 var app = builder.Build();
 
@@ -82,6 +79,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

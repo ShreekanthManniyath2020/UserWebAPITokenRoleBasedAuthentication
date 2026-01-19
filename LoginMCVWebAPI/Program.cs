@@ -1,3 +1,4 @@
+using LoginMCVWebAPI.Middleware;
 using LoginMCVWebAPI.Services;
 using LoginMCVWebAPI.Services.Interfaces;
 
@@ -45,6 +46,8 @@ builder.Services.AddSession(options =>
 
 var app = builder.Build();
 
+
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -63,8 +66,10 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
+    pattern: "{controller=Account}/{action=Login}/{id?}") // "{controller=Home}/{action=Index}/{id?}"
     .WithStaticAssets();
 
+// Use custom extensions
+app.UseTokenRefresh();
 
 app.Run();

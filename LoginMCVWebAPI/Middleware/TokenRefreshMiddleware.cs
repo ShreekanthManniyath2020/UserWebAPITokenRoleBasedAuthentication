@@ -16,6 +16,7 @@ namespace LoginMCVWebAPI.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
+            string? token = null;
             // Skip token refresh for auth endpoints
             if (context.Request.Path.StartsWithSegments("/Account/Login") ||
                 context.Request.Path.StartsWithSegments("/Account/Register") ||
@@ -26,7 +27,8 @@ namespace LoginMCVWebAPI.Middleware
                 return;
             }
 
-            var token = context.Session.GetString("JwtToken");
+            if(context.Session != null)
+                token = context.Session.GetString("JwtToken");
 
             if (!string.IsNullOrEmpty(token))
             {
@@ -38,7 +40,7 @@ namespace LoginMCVWebAPI.Middleware
 
                     if (result.Success && result.Data != null)
                     {
-                        _authApiClient.SetTokens(result.Data.AccessToken, result.Data.RefreshToken);
+                        _authApiClient.SetTokens(result.Data.AccessToken, result.Data.RefreshToken, result.Data.User.Id);
 
                         // Update claims if needed
                         var claims = new[]
