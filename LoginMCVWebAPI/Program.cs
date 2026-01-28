@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+//builder.Services.AddCustomErrorHandling();
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
 
@@ -55,6 +56,8 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+// Use custom error handling middleware
+//app.UseCustomErrorHandling();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -64,12 +67,13 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapStaticAssets();
 
+// Use custom extensions
+app.UseTokenRefresh();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=Login}/{id?}") // "{controller=Home}/{action=Index}/{id?}"
     .WithStaticAssets();
 
-// Use custom extensions
-app.UseTokenRefresh();
 
 app.Run();

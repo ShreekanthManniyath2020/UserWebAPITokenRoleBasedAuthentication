@@ -133,7 +133,7 @@ namespace LoginMCVWebAPI.Services
                 });
 
 
-                return new ApiResponse<T> { Success = false, Message =  "An error occurred" }; //error?.Message ??
+                return new ApiResponse<T> { Success = false, Message = error }; //error?.Message ??
             }
         }
     }
